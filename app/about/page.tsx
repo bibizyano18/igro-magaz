@@ -3,13 +3,13 @@ import Link from "next/link";
 export default function About() {
     return (
         <main className="container">
-            <h1 className="title">GameVault</h1>
+            <h1 className="title">igro-magaz</h1>
             <p className="subtitle">Страница о проекте</p>
 
             <section className="section">
                 <h2>Название проекта</h2>
                 <p>
-                    <strong>GameVault</strong> — магазин цифровых игр и интеллектуальный помощник для геймеров.
+                    <strong>igro-magaz</strong> — магазин цифровых игр и интеллектуальный помощник для геймеров.
                 </p>
             </section>
 

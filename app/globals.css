@@ -1,9 +1,17 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 20px;
   background: #f9f9f9;
   color: black;
+}
+
+button {
+  cursor: pointer;
 }
 
 /* Контейнер */
@@ -88,4 +96,154 @@ body {
 
 .button:hover {
   background: #1a2632;
+}
+
+/* Шапка и навигация (лабораторная № 2) */
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 72px;
+  max-width: 800px;
+  margin: 0 auto 20px;
+  padding: 12px 24px;
+  border-bottom: 1px solid #d7d2c8;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.brand {
+  color: darkgreen;
+  font-size: 22px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-link,
+.login-link {
+  display: inline-block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #2c3e50;
+}
+
+.nav-link[aria-current="page"] {
+  background: #dbefae;
+  color: #123b5d;
+  font-weight: 700;
+}
+
+.auth-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.eyebrow {
+  margin-bottom: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lead {
+  max-width: 680px;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.primary-link {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: #2c3e50;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+/* Оформляем интерактивную карточку объекта. */
+.card {
+  padding: 22px;
+  border: 1px solid #d7d2c8;
+  border-radius: 14px;
+  background: #f4f6f8;
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.form-page {
+  max-width: 800px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0;
+  padding: 24px;
+  border-radius: 14px;
+  background: #f4f6f8;
+}
+
+.auth-form input {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #8d99a6;
+  border-radius: 8px;
+}
+
+.auth-form button {
+  min-height: 44px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #2c3e50;
+  color: #fff;
+  font-weight: 700;
+}
+
+.demo-warning {
+  padding: 12px 14px;
+  border-left: 4px solid #c67c00;
+  background: #fff4d6;
+}
+
+.form-error {
+  color: #9b1c1c;
+  font-weight: 700;
+}
+
+.profile-list {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 16px 160px;
+  max-width: 520px;
+}
+
+.profile-list dt {
+  font-weight: 700;
+}
+
+.profile-list dd {
+  margin: 0;
 }
