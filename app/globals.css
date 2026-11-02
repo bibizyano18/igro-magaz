@@ -247,3 +247,69 @@ button {
 .profile-list dd {
   margin: 0;
 }
+
+/* Вишлист на странице каталога (лабораторная № 3) */
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.wishlist-btn {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid #2c3e50;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #2c3e50;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.wishlist-btn:hover {
+  background: #eef1f4;
+}
+
+/* Активное состояние: игра уже добавлена в вишлист. */
+.wishlist-btn_active {
+  background: #dbefae;
+  border-color: #1a6b3c;
+  color: #123b5d;
+}
+
+.wishlist-login {
+  color: #5b6470;
+}
+
+/* Список вишлиста в личном кабинете (лабораторная № 3) */
+.wishlist-list {
+  display: grid;
+  gap: 12px;
+  max-width: 640px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wishlist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border: 1px solid #d7d2c8;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.wishlist-item__info {
+  display: grid;
+  gap: 4px;
+}
+
+.wishlist-item__info small {
+  color: #5b6470;
+}

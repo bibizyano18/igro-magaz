@@ -1,13 +1,16 @@
-// Показывает состояние гостя или данные учебного пользователя.
+// Показывает состояние гостя, данные учебного пользователя и вишлист.
 
 "use client";
 
 import Link from "next/link";
+import { games } from "../data/games";
 import { useDemoAuth } from "../providers/DemoAuthProvider";
+import { useWishlist } from "../providers/WishlistProvider";
 
 // Объявляем основной компонент этого файла.
 export default function CabinetPage() {
   const { user, logout } = useDemoAuth();
+  const { ids, toggle } = useWishlist();
 
   // Для гостя предлагаем перейти на форму входа.
   if (!user) {
@@ -24,6 +27,9 @@ export default function CabinetPage() {
     );
   }
 
+  // Отбираем из каталога игры, добавленные в вишлист.
+  const wishlistGames = games.filter((game) => ids.has(game.id));
+
   // Для учебного пользователя выводим его данные и кнопку выхода.
   return (
     <main className="container">
@@ -37,8 +43,44 @@ export default function CabinetPage() {
       </dl>
 
       <section className="section">
-        <h2>Мои игры</h2>
-        <p>Здесь появятся купленные игры и вишлист после подключения базы данных.</p>
+        <h2>Вишлист</h2>
+        {wishlistGames.length === 0 ? (
+          <p>
+            Вишлист пуст.{" "}
+            <Link href="/catalog">Добавьте игры в каталоге</Link>.
+          </p>
+        ) : (
+          <>
+            <p>
+              Всего игр: {wishlistGames.length}. Список обновляется сразу после
+              добавления или удаления игры в каталоге.
+            </p>
+            <ul className="wishlist-list">
+              {wishlistGames.map((game) => (
+                <li className="wishlist-item" key={game.id}>
+                  <span className="wishlist-item__info">
+                    <Link href={`/catalog/${game.id}`}>{game.title}</Link>
+                    <small>
+                      {game.genre} · {game.platform} · {game.price} ₽
+                    </small>
+                  </span>
+                  <button
+                    className="wishlist-btn"
+                    type="button"
+                    onClick={() => toggle(game.id)}
+                  >
+                    Убрать
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+
+      <section className="section">
+        <h2>Купленные игры</h2>
+        <p>Здесь появятся купленные игры после подключения базы данных.</p>
       </section>
 
       <button type="button" onClick={logout}>

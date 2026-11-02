@@ -8,6 +8,13 @@ export type Game = {
   genre: string;
   platform: string;
   price: number;
+  // Лабораторная № 3: фотография магазина и его координаты.
+  image: string;
+  imageAlt: string;
+  storeName: string;
+  storeAddress: string;
+  latitude: number;
+  longitude: number;
 };
 
 export const games: Game[] = [
@@ -18,6 +25,12 @@ export const games: Game[] = [
     genre: "RPG",
     platform: "PC",
     price: 1999,
+    image: "/images/games/magaz1.jpg",
+    imageAlt: "Торговый зал магазина «Пиксель»: стеллажи с играми и стена с бейджами",
+    storeName: "Магазин «Пиксель»",
+    storeAddress: "Москва, Никольская улица, 10",
+    latitude: 55.7547,
+    longitude: 37.6217,
   },
   {
     id: "baldurs-gate-3",
@@ -26,6 +39,12 @@ export const games: Game[] = [
     genre: "RPG",
     platform: "PC, PlayStation",
     price: 2999,
+    image: "/images/games/magaz2.jpg",
+    imageAlt: "Стеллажи с настольными играми и витрина с игрушками в магазине «Хобби-зона»",
+    storeName: "Магазин «Хобби-зона»",
+    storeAddress: "Москва, ТЦ «Атриум», Земляной Вал, 33",
+    latitude: 55.759,
+    longitude: 37.6508,
   },
   {
     id: "silksong",
@@ -34,6 +53,12 @@ export const games: Game[] = [
     genre: "Метроидвания",
     platform: "PC, Nintendo Switch",
     price: 1399,
+    image: "/images/games/magaz3.png",
+    imageAlt: "Полки с настольными играми в магазине «Консоль-Пойнт»",
+    storeName: "Магазин «Консоль-Пойнт»",
+    storeAddress: "Москва, Ленинский проспект, 109",
+    latitude: 55.6602,
+    longitude: 37.4926,
   },
 ];
 
