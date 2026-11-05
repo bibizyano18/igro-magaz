@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import DemoAuthProvider from "./providers/DemoAuthProvider";
 import WishlistProvider from "./providers/WishlistProvider";
@@ -17,8 +17,14 @@ const geistMono = Geist_Mono({
 
 // Задаём заголовок и описание страницы для Metadata API.
 export const metadata: Metadata = {
-  title: "igro-magaz",
+  title: "igro-magaz — каталог игр и магазины",
   description: "Магазин цифровых игр и вишлистов",
+};
+
+// Указываем цвет темы и цветовую схему; width=device-width добавляет App Router.
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  colorScheme: "light",
 };
 
 // Объявляем основной компонент этого файла.

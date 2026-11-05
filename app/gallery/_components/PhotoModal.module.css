@@ -1,47 +1,52 @@
 /* Размещает модальное окно поверх страницы и ограничивает его видимой областью. */
 
-/* Перекрываем viewport затемнённым фоном. */
+/* Перекрываем viewport затемнённым фоном; отступ зависит от ширины экрана. */
 .overlay {
   position: fixed;
   inset: 0;
   z-index: 3000;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: clamp(0.5rem, 3vw, 1.5rem);
   background: rgb(15 23 42 / 72%);
 }
 
 /* Ограничиваем размеры окна и разрешаем прокрутку длинного содержимого. */
 .dialog {
   position: relative;
-  width: min(760px, 100%);
-  max-height: calc(100dvh - 48px);
+  width: min(47.5rem, 100%);
+  max-height: calc(100dvh - 1rem);
   overflow-y: auto;
-  padding: 28px;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 24px 70px rgb(0 0 0 / 35%);
+  overscroll-behavior: contain;
+  padding: clamp(1rem, 4vw, 1.75rem);
+  border-radius: clamp(0.75rem, 2vw, 1rem);
+  background: var(--surface);
+  box-shadow: 0 1.5rem 4.4rem rgb(0 0 0 / 35%);
 }
 
 .dialog h2 {
-  margin: 0 48px 18px 0;
+  margin: 0 3rem 1rem 0;
+  font-size: clamp(1.4rem, 4vw, 2rem);
   color: darkgreen;
+  overflow-wrap: anywhere;
 }
 
 .dialog h3 {
-  margin: 16px 0 8px;
+  margin: 1rem 0 0.5rem;
 }
 
 .close {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 40px;
-  height: 40px;
+  top: clamp(0.5rem, 2vw, 0.9rem);
+  right: clamp(0.5rem, 2vw, 0.9rem);
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
   border: 0;
   border-radius: 50%;
   background: #e8edf2;
-  font-size: 28px;
+  font-size: 1.75rem;
   line-height: 1;
 }
 
@@ -49,20 +54,40 @@
 .close:focus-visible,
 .dialog a:focus-visible,
 .dialog button:focus-visible {
-  outline: 4px solid darkgreen;
+  outline: 4px solid var(--focus);
   outline-offset: 3px;
 }
 
 .image {
   width: 100%;
   height: auto;
-  border-radius: 12px;
+  border-radius: clamp(0.5rem, 2vw, 0.75rem);
   object-fit: cover;
+}
+
+/* Строка действий: переносится и не переполняет окно. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.actions > * {
+  min-height: 2.75rem;
+}
+
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  color: #1c4ea2;
+  overflow-wrap: anywhere;
 }
 
 /* Кнопка избранного в модальном окне (лабораторная № 3). */
 .favorite {
-  min-height: 40px;
+  min-height: 2.75rem;
   padding: 8px 14px;
   border: 1px solid #2c3e50;
   border-radius: 8px;
@@ -73,20 +98,50 @@
   transition: background 0.2s;
 }
 
-.favorite:hover {
-  background: #eef1f4;
-}
-
 /* Активное состояние: игра уже добавлена в избранное. */
 .favoriteActive {
-  background: #dbefae;
   border-color: #1a6b3c;
+  background: #dbefae;
   color: #123b5d;
+}
+
+/* Hover включаем только для точного указателя. */
+@media (hover: hover) and (pointer: fine) {
+  .favorite:hover {
+    background: #eef1f4;
+  }
 }
 
 /* Предупреждение об учебном хранении избранного. */
 .note {
   margin: 8px 0 0;
-  color: #5b6470;
-  font-size: 14px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* На узком экране действия занимают всю ширину окна. */
+@media (max-width: 30rem) {
+  .actions {
+    display: grid;
+  }
+
+  .actions > * {
+    width: 100%;
+  }
+
+  .dialog h2 {
+    margin-right: 2.75rem;
+  }
+}
+
+/* Учитываем небольшую высоту экрана в альбомной ориентации. */
+@media (orientation: landscape) and (max-height: 32rem) {
+  .dialog {
+    max-height: calc(100dvh - 0.5rem);
+    padding: 0.75rem;
+  }
+
+  .dialog h2 {
+    font-size: 1.2rem;
+  }
 }

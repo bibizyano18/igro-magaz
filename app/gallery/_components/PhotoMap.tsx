@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Game } from "../../data/games";
 import styles from "./PhotoMap.module.css";
 
@@ -16,6 +16,10 @@ type YandexPlacemark = {
 };
 
 type YandexMap = {
+  // Контейнер карты умеет пересчитывать размеры после изменения макета.
+  container: {
+    fitToViewport: () => void;
+  };
   geoObjects: {
     add: (placemark: YandexPlacemark) => void;
   };
@@ -97,6 +101,16 @@ function loadMaps(apiKey: string): Promise<YandexMapsApi> {
   return mapsPromise;
 }
 
+// Даём ссылке на логотип в копирайте доступное имя: своего текста у неё нет.
+function nameCopyrightLink(container: HTMLElement) {
+  const link = container.querySelector<HTMLAnchorElement>(
+    ".ymaps-2-1-79-copyright__logo-cell a",
+  );
+  if (link && !link.getAttribute("aria-label")) {
+    link.setAttribute("aria-label", "Яндекс Карты");
+  }
+}
+
 // Объявляем основной компонент этого файла.
 export default function PhotoMap({
   games,
@@ -112,6 +126,48 @@ export default function PhotoMap({
     () => (apiKey ? "loading" : "no-key"),
   );
 
+  const initialise = useCallback(async (): Promise<YandexMap | null> => {
+    if (!apiKey || !containerRef.current || games.length === 0) return null;
+
+    try {
+      const ymaps = await loadMaps(apiKey);
+      if (!containerRef.current) return null;
+
+      const first = games[0];
+      // Создаём экземпляр карты в подготовленном DOM-контейнере.
+      const map = new ymaps.Map(containerRef.current, {
+        center: [first.latitude, first.longitude],
+        zoom: 11,
+        controls: ["zoomControl"],
+      });
+
+      // Добавляем на карту метку для каждого магазина игры.
+      games.forEach((game) => {
+        const placemark = new ymaps.Placemark(
+          [game.latitude, game.longitude],
+          {
+            hintContent: game.storeName,
+            balloonContent: game.storeAddress,
+          },
+          {
+            preset: "islands#circleDotIcon",
+            iconColor: "#1a6b3c",
+          },
+        );
+
+        placemark.events.add("click", () => onSelect(game));
+        map.geoObjects.add(placemark);
+      });
+
+      nameCopyrightLink(containerRef.current);
+      setStatus("ready");
+      return map;
+    } catch {
+      setStatus("error");
+      return null;
+    }
+  }, [apiKey, games, onSelect]);
+
   // Синхронизируем компонент с браузерными событиями или внешним API.
   useEffect(() => {
     if (!apiKey) {
@@ -119,58 +175,55 @@ export default function PhotoMap({
       return;
     }
 
-    if (!containerRef.current || games.length === 0) return;
+    const container = containerRef.current;
+    if (!container || games.length === 0) return;
 
     let disposed = false;
+    let started = false;
     let map: YandexMap | null = null;
+    let resizeObserver: ResizeObserver | null = null;
+    let visibilityObserver: IntersectionObserver | null = null;
 
     async function buildMap() {
-      try {
-        const ymaps = await loadMaps(apiKey);
-        if (disposed || !containerRef.current) return;
+      const created = await initialise();
+      if (disposed || !containerRef.current) return;
+      map = created;
+      if (!map) return;
 
-        const first = games[0];
-        // Создаём экземпляр карты в подготовленном DOM-контейнере.
-        map = new ymaps.Map(containerRef.current, {
-          center: [first.latitude, first.longitude],
-          zoom: 11,
-          controls: ["zoomControl"],
+      // Пересчитываем размеры карты при изменении контейнера.
+      if (typeof ResizeObserver !== "undefined") {
+        resizeObserver = new ResizeObserver(() => {
+          map?.container.fitToViewport();
         });
-
-        // Добавляем на карту метку для каждого магазина игры.
-        games.forEach((game) => {
-          // Создаём метку с координатами и данными текущего объекта.
-          const placemark = new ymaps.Placemark(
-            [game.latitude, game.longitude],
-            {
-              hintContent: game.storeName,
-              balloonContent: game.storeAddress,
-            },
-            {
-              preset: "islands#circleDotIcon",
-              iconColor: "#1a6b3c",
-            },
-          );
-
-          placemark.events.add("click", () => onSelect(game));
-          map?.geoObjects.add(placemark);
-        });
-
-        if (!disposed) setStatus("ready");
-      } catch {
-        if (!disposed) setStatus("error");
+        resizeObserver.observe(containerRef.current);
       }
     }
 
-    void buildMap();
+    // Карта и её скрипт не нужны до того, как блок появится рядом с экраном.
+    if (typeof IntersectionObserver !== "undefined") {
+      visibilityObserver = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting) || started) return;
+          started = true;
+          visibilityObserver?.disconnect();
+          void buildMap();
+        },
+        { rootMargin: "200px" },
+      );
+      visibilityObserver.observe(container);
+    } else {
+      started = true;
+      void buildMap();
+    }
 
     // В cleanup освобождаем подписки и внешние ресурсы эффекта.
     return () => {
       disposed = true;
-      // Уничтожаем экземпляр карты и его обработчики.
+      visibilityObserver?.disconnect();
+      resizeObserver?.disconnect();
       map?.destroy();
     };
-  }, [apiKey, onSelect, games]);
+  }, [apiKey, games, initialise]);
 
   // Возвращаем JSX-разметку, которую React выведет на странице.
   return (
@@ -192,11 +245,7 @@ export default function PhotoMap({
         <p className={styles.status}>Карта загружается…</p>
       ) : null}
 
-      <div
-        ref={containerRef}
-        className={styles.canvas}
-        aria-label="Интерактивная карта игровых магазинов"
-      />
+      <div ref={containerRef} className={styles.canvas} />
     </section>
   );
 }

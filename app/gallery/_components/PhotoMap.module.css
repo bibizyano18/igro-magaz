@@ -1,22 +1,31 @@
-/* Задаёт размеры контейнера карты и оформление сообщений состояния. */
+/* Задаёт адаптивные размеры контейнера карты и оформление сообщений состояния. */
 
 .section {
-  margin-top: 48px;
+  margin-top: clamp(2rem, 6vw, 3rem);
 }
 
-/* Задаём явные размеры контейнера интерактивной карты. */
+/* Задаём явную адаптивную высоту контейнера интерактивной карты. */
 .canvas {
   width: 100%;
-  height: 480px;
+  height: clamp(18rem, 58vh, 32rem);
   overflow: hidden;
-  border: 1px solid #b9c0c8;
-  border-radius: 16px;
+  border: 1px solid var(--border);
+  border-radius: clamp(0.75rem, 2vw, 1rem);
   background: #dbe3ea;
 }
 
 /* Выделяем сообщения о загрузке или ошибке карты. */
 .status {
   padding: 12px 14px;
-  border-left: 4px solid darkgreen;
+  border-left: 4px solid var(--accent);
   background: #eaf5ec;
+  overflow-wrap: anywhere;
+}
+
+/* На узком экране карта занимает большую часть высоты, но не весь экран. */
+@media (max-width: 30rem) {
+  .canvas {
+    height: min(65dvh, 24rem);
+    border-radius: 0.6rem;
+  }
 }

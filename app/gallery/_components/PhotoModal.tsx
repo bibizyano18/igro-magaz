@@ -140,13 +140,14 @@ export default function PhotoModal({
           {game.genre} · {game.platform} · {game.price} ₽
         </p>
 
-        <p>
-          <Link href={`/catalog/${game.id}`}>Страница игры в каталоге</Link>
-        </p>
+        <h3>Действия</h3>
+        {/* Строка действий переносится, а на узком экране занимает всю ширину. */}
+        <div className={styles.actions}>
+          <Link className={styles.actionLink} href={`/catalog/${game.id}`}>
+            Страница игры в каталоге
+          </Link>
 
-        <h3>Избранное</h3>
-        {user ? (
-          <>
+          {user ? (
             <button
               className={
                 has(game.id)
@@ -161,17 +162,18 @@ export default function PhotoModal({
                 ? "Удалить из избранного"
                 : "Добавить в избранное"}
             </button>
-            <p className={styles.note}>
-              Избранное хранится только до обновления страницы.
-            </p>
-          </>
-        ) : (
-          <p>
-            <Link href="/auth/login">
+          ) : (
+            <Link className={styles.actionLink} href="/auth/login">
               Войдите, чтобы использовать избранное
             </Link>
+          )}
+        </div>
+
+        {user ? (
+          <p className={styles.note}>
+            Избранное хранится только до обновления страницы.
           </p>
-        )}
+        ) : null}
       </div>
     </div>,
     document.body,

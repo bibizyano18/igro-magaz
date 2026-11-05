@@ -1,51 +1,73 @@
-* {
+/* Задаёт дизайн-токены, базовую адаптивную страницу и общие правила проекта. */
+
+/* Объявляем общие дизайн-токены приложения. */
+:root {
+  --page-max: 72rem;
+  --page-inline: clamp(1rem, 4vw, 3rem);
+  --surface: #ffffff;
+  --background: #f4f2ec;
+  --text: #14171a;
+  --muted: #55606b;
+  --border: #d7d2c8;
+  --accent: #1a6b3c;
+  --focus: #0b4f9c;
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
+html {
+  color-scheme: light;
+  background: var(--background);
+}
+
+/* Задаём базовые параметры страницы и типографики. */
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  min-width: 20rem;
   margin: 0;
-  padding: 20px;
-  background: #f9f9f9;
-  color: black;
+  background: var(--background);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
 }
 
-button {
-  cursor: pointer;
-}
-
-/* Контейнер */
+/* Ограничиваем ширину основного содержимого и выравниваем его по центру. */
 .container {
-  max-width: 800px;
-  margin: 0 auto;
-  background: #fff;
-  padding: 30px;
-  border-radius: 12px;
+  width: min(var(--page-max), 100%);
+  margin-inline: auto;
+  padding: clamp(1rem, 4vw, 3rem);
+  border-radius: clamp(0.5rem, 2vw, 0.75rem);
+  background: var(--surface);
 }
 
 /* Заголовки */
 .title {
-  font-size: 2.5rem;
   margin-bottom: 0.2rem;
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  line-height: 1.15;
   color: darkgreen;
+  text-wrap: balance;
 }
 
 .subtitle {
-  font-size: 1.2rem;
-  color: darkgreen;
   margin-top: 0;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.25rem, 4vw, 2rem);
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  color: darkgreen;
 }
 
 /* Секции */
 .section {
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
 }
 
 .section h2 {
-  font-size: 1.5rem;
-  border-bottom: 2px solid #eaecef;
   padding-bottom: 0.3rem;
+  border-bottom: 2px solid #eaecef;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
   color: darkgreen;
 }
 
@@ -57,17 +79,17 @@ button {
 /* Сетка для карточек функций */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12.5rem), 1fr));
+  gap: clamp(1rem, 3vw, 1.5rem);
   margin-top: 0.5rem;
 }
 
 /* Карточка функции */
 .feature-card {
-  background: #f4f6f8;
   padding: 10px;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  border: 1px solid black;
+  background: #f4f6f8;
 }
 
 .feature-card h3 {
@@ -85,69 +107,13 @@ button {
 /* Кнопка-ссылка */
 .button {
   display: inline-block;
-  background: #2c3e50;
-  color: white;
   padding: 0.7rem 1.8rem;
   border-radius: 6px;
-  text-decoration: none;
+  background: #2c3e50;
+  color: white;
   font-weight: 500;
+  text-decoration: none;
   transition: background 0.2s;
-}
-
-.button:hover {
-  background: #1a2632;
-}
-
-/* Шапка и навигация (лабораторная № 2) */
-.site-header {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  min-height: 72px;
-  max-width: 800px;
-  margin: 0 auto 20px;
-  padding: 12px 24px;
-  border-bottom: 1px solid #d7d2c8;
-  border-radius: 12px;
-  background: #fff;
-}
-
-.brand {
-  color: darkgreen;
-  font-size: 22px;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.nav-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.nav-link,
-.login-link {
-  display: inline-block;
-  padding: 8px 10px;
-  border-radius: 8px;
-  text-decoration: none;
-  color: #2c3e50;
-}
-
-.nav-link[aria-current="page"] {
-  background: #dbefae;
-  color: #123b5d;
-  font-weight: 700;
-}
-
-.auth-summary {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-left: auto;
 }
 
 .eyebrow {
@@ -158,13 +124,14 @@ button {
 }
 
 .lead {
-  max-width: 680px;
-  font-size: 20px;
+  max-width: 42rem;
+  font-size: clamp(1rem, 2.4vw, 1.25rem);
   line-height: 1.6;
 }
 
 .primary-link {
   display: inline-block;
+  min-height: 2.75rem;
   margin-top: 16px;
   padding: 12px 18px;
   border-radius: 10px;
@@ -174,22 +141,30 @@ button {
   text-decoration: none;
 }
 
+/* Сетка каталога: базовая одна колонка, остальные добавляет auto-fit. */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: clamp(0.9rem, 2.5vw, 1.5rem);
 }
 
 /* Оформляем интерактивную карточку объекта. */
 .card {
-  padding: 22px;
-  border: 1px solid #d7d2c8;
+  min-width: 0;
+  padding: clamp(1rem, 3vw, 1.375rem);
+  border: 1px solid var(--border);
   border-radius: 14px;
   background: #f4f6f8;
 }
 
 .card h2 {
   margin-top: 0;
+  font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+  overflow-wrap: anywhere;
+}
+
+.card p {
+  overflow-wrap: anywhere;
 }
 
 .form-page {
@@ -200,7 +175,7 @@ button {
   display: grid;
   gap: 10px;
   margin: 24px 0;
-  padding: 24px;
+  padding: clamp(1rem, 3vw, 1.5rem);
   border-radius: 14px;
   background: #f4f6f8;
 }
@@ -229,15 +204,15 @@ button {
 }
 
 .form-error {
-  color: #9b1c1c;
+  color: var(--danger, #9b1c1c);
   font-weight: 700;
 }
 
 .profile-list {
   display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 16px 160px;
-  max-width: 520px;
+  grid-template-columns: minmax(6rem, 8rem) minmax(0, 1fr);
+  gap: 0.5rem 1rem;
+  max-width: 32rem;
 }
 
 .profile-list dt {
@@ -246,6 +221,7 @@ button {
 
 .profile-list dd {
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 /* Вишлист на странице каталога (лабораторная № 3) */
@@ -269,26 +245,22 @@ button {
   transition: background 0.2s;
 }
 
-.wishlist-btn:hover {
-  background: #eef1f4;
-}
-
 /* Активное состояние: игра уже добавлена в вишлист. */
 .wishlist-btn_active {
-  background: #dbefae;
   border-color: #1a6b3c;
+  background: #dbefae;
   color: #123b5d;
 }
 
 .wishlist-login {
-  color: #5b6470;
+  color: var(--muted);
 }
 
 /* Список вишлиста в личном кабинете (лабораторная № 3) */
 .wishlist-list {
   display: grid;
   gap: 12px;
-  max-width: 640px;
+  max-width: 40rem;
   margin: 16px 0;
   padding: 0;
   list-style: none;
@@ -296,11 +268,12 @@ button {
 
 .wishlist-item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 0.75rem 1rem;
   padding: 12px 16px;
-  border: 1px solid #d7d2c8;
+  border: 1px solid var(--border);
   border-radius: 10px;
   background: #ffffff;
 }
@@ -308,8 +281,67 @@ button {
 .wishlist-item__info {
   display: grid;
   gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .wishlist-item__info small {
-  color: #5b6470;
+  color: var(--muted);
+}
+
+/* Не даём медиаэлементам выходить за пределы контейнера. */
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Показываем заметный фокус при клавиатурной навигации. */
+:focus-visible {
+  outline: 0.25rem solid var(--focus);
+  outline-offset: 0.2rem;
+}
+
+/* Hover включаем только там, где есть точный указатель. */
+@media (hover: hover) and (pointer: fine) {
+  .button:hover {
+    background: #1a2632;
+  }
+
+  .wishlist-btn:hover {
+    background: #eef1f4;
+  }
+}
+
+/* На узком экране элементы списка вишлиста занимают всю ширину. */
+@media (max-width: 30rem) {
+  .wishlist-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .wishlist-item .wishlist-btn {
+    width: 100%;
+  }
+}
+
+/* Уменьшаем необязательное движение по системной настройке пользователя. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

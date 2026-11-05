@@ -4,7 +4,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { games, type Game } from "../../data/games";
 import PhotoMap from "./PhotoMap";
 import PhotoModal from "./PhotoModal";
@@ -24,21 +24,23 @@ export default function PlacesGallery() {
     setSelected(game);
   }
 
-  function openFromMap(game: Game) {
+  // Обработчик карты не пересоздаётся между рендерами: иначе эффект карты
+  // выполнялся бы заново при каждом изменении выбранного магазина.
+  const openFromMap = useCallback((game: Game) => {
     // Метка карты управляется внешним canvas API: фокус возвращаем лишь логично.
     setReturnFocusTo(null);
     setSelected(game);
-  }
+  }, []);
 
-  function closeModal() {
+  const closeModal = useCallback(() => {
     setSelected(null);
-  }
+  }, []);
 
   // Возвращаем JSX-разметку, которую React выведет на странице.
   return (
     <>
       <div className={styles.grid}>
-        {games.map((game) => (
+        {games.map((game, index) => (
           <button
             className={styles.card}
             type="button"
@@ -46,16 +48,21 @@ export default function PlacesGallery() {
             onClick={(event) => openFromCard(game, event.currentTarget)}
           >
             <span className={styles.imageWrap}>
+              {/* Первые две карточки видны на первом экране: грузим их с приоритетом. */}
               <Image
                 src={game.image}
                 alt={game.imageAlt}
                 fill
-                sizes="(max-width: 700px) 100vw, 33vw"
+                priority={index < 2}
+                loading={index < 2 ? undefined : "lazy"}
+                sizes="(max-width: 30rem) calc(100vw - 2rem), (max-width: 48rem) 50vw, (max-width: 75rem) 30vw, 18rem"
                 className={styles.image}
               />
             </span>
-            <span className={styles.title}>{game.storeName}</span>
-            <span className={styles.summary}>{game.storeAddress}</span>
+            <span className={styles.cardBody}>
+              <span className={styles.title}>{game.storeName}</span>
+              <span className={styles.summary}>{game.storeAddress}</span>
+            </span>
           </button>
         ))}
       </div>
