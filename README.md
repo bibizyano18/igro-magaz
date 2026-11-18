@@ -40,6 +40,9 @@ npx prisma validate
 npx prisma generate
 npm run db:check
 
+npx prisma migrate status
+cat prisma/migrations/*/migration.sql
+
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

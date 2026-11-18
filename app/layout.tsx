@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import DemoAuthProvider from "./providers/DemoAuthProvider";
+import AuthProvider from "./providers/AuthProvider";
 import WishlistProvider from "./providers/WishlistProvider";
 import BurgerMenu from "./ui/BurgerMenu/BurgerMenu";
 import "./globals.css";
@@ -36,12 +36,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <DemoAuthProvider>
+        <AuthProvider>
           <WishlistProvider>
             <BurgerMenu />
             {children}
           </WishlistProvider>
-        </DemoAuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );

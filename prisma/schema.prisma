@@ -1,17 +1,84 @@
-// Генерирует Prisma Client для установленной версии Prisma ORM 6.19.2.
+// Генерирует Prisma Client для серверного TypeScript-кода.
 generator client {
   provider = "prisma-client-js"
 }
 
-// Читает локальное подключение PostgreSQL из DATABASE_URL.
+// Подключает PostgreSQL через локальную переменную DATABASE_URL.
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Отдельная БД для Prisma Migrate: роль study_app без CREATEDB.
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-// Временная модель позволяет проверить генерацию клиента.
-// В ЛР6 она удаляется до создания первой миграции.
-model SetupCheck {
-  // Описывает тестовый первичный ключ только на уровне Prisma Schema.
-  id Int @id
+// Хранит зарегистрированного пользователя и его безопасные метаданные.
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @db.VarChar(80)
+  email        String   @unique @db.VarChar(254)
+  passwordHash String   @db.VarChar(255)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  // Связывает пользователя со строками его вишлиста.
+  favorites FavoriteGame[]
+}
+
+// Хранит физический магазин: название, адрес и координаты для карты.
+model Store {
+  id        String   @id @default(uuid()) @db.Uuid
+  slug      String   @unique @db.VarChar(80)
+  name      String   @db.VarChar(120)
+  address   String   @db.VarChar(240)
+  latitude  Decimal  @db.Decimal(9, 6)
+  longitude Decimal  @db.Decimal(9, 6)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  // Магазин может продавать несколько игр каталога.
+  games Game[]
+}
+
+// Хранит игру каталога, привязанную к одному магазину.
+model Game {
+  id        String   @id @default(uuid()) @db.Uuid
+  slug      String   @unique @db.VarChar(80)
+  title     String   @db.VarChar(160)
+  summary   String   @db.Text
+  genre     String   @db.VarChar(40)
+  platform  String   @db.VarChar(40)
+  price     Int
+  image     String   @db.VarChar(240)
+  imageAlt  String   @db.VarChar(240)
+  storeId   String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  // Игра принадлежит ровно одному магазину.
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  // Связывает игру со всеми пользовательскими добавлениями в вишлист.
+  favorites FavoriteGame[]
+
+  // Ускоряем поиск игр одного магазина: внешний ключ не индексируется сам.
+  @@index([storeId])
+}
+
+// Реализует явную связь многие-ко-многим между User и Game.
+model FavoriteGame {
+  userId    String   @db.Uuid
+  gameId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  // Удаляем зависимую связь вместе с пользователем.
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Удаляем зависимую связь вместе с игрой каталога.
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  // Запрещаем повтор одной пары пользователь–игра.
+  @@id([userId, gameId])
+
+  // Ускоряем обратный поиск связей по игре.
+  @@index([gameId])
 }

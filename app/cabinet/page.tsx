@@ -1,25 +1,33 @@
-// Показывает состояние гостя, данные учебного пользователя и вишлист.
+// Показывает состояние гостя, данные пользователя и вишлист из базы.
 
 "use client";
 
 import Link from "next/link";
 import { games } from "../data/games";
-import { useDemoAuth } from "../providers/DemoAuthProvider";
+import { useAuth } from "../providers/AuthProvider";
 import { useWishlist } from "../providers/WishlistProvider";
 
 // Объявляем основной компонент этого файла.
 export default function CabinetPage() {
-  const { user, logout } = useDemoAuth();
-  const { ids, toggle } = useWishlist();
+  const { user, loading, logout } = useAuth();
+  const { ids, loading: wishlistLoading, toggle } = useWishlist();
+
+  // Пока сервер отвечает на /api/auth/me, не показываем ложного гостя.
+  if (loading) {
+    return (
+      <main className="container">
+        <h1 className="title">Личный кабинет</h1>
+        <p>Проверяем сессию…</p>
+      </main>
+    );
+  }
 
   // Для гостя предлагаем перейти на форму входа.
   if (!user) {
     return (
       <main className="container">
         <h1 className="title">Личный кабинет</h1>
-        <p className="demo-warning">
-          Пользователь не вошёл. Это учебное состояние прототипа.
-        </p>
+        <p className="demo-warning">Пользователь не вошёл.</p>
         <Link className="primary-link" href="/auth/login">
           Перейти ко входу
         </Link>
@@ -30,11 +38,11 @@ export default function CabinetPage() {
   // Отбираем из каталога игры, добавленные в вишлист.
   const wishlistGames = games.filter((game) => ids.has(game.id));
 
-  // Для учебного пользователя выводим его данные и кнопку выхода.
+  // Для пользователя выводим его данные и кнопку выхода.
   return (
     <main className="container">
       <h1 className="title">Личный кабинет</h1>
-      <p className="subtitle">Учебный пользователь демонстрационного режима</p>
+      <p className="subtitle">Данные получены из базы данных через API</p>
       <dl className="profile-list">
         <dt>Имя</dt>
         <dd>{user.name}</dd>
@@ -44,7 +52,9 @@ export default function CabinetPage() {
 
       <section className="section">
         <h2>Вишлист</h2>
-        {wishlistGames.length === 0 ? (
+        {wishlistLoading ? (
+          <p>Загружаем избранное…</p>
+        ) : wishlistGames.length === 0 ? (
           <p>
             Вишлист пуст.{" "}
             <Link href="/catalog">Добавьте игры в каталоге</Link>.
@@ -52,8 +62,8 @@ export default function CabinetPage() {
         ) : (
           <>
             <p>
-              Всего игр: {wishlistGames.length}. Список обновляется сразу после
-              добавления или удаления игры в каталоге.
+              Всего игр: {wishlistGames.length}. Список хранится в базе и
+              восстанавливается после перезагрузки страницы.
             </p>
             <ul className="wishlist-list">
               {wishlistGames.map((game) => (
@@ -67,7 +77,7 @@ export default function CabinetPage() {
                   <button
                     className="wishlist-btn"
                     type="button"
-                    onClick={() => toggle(game.id)}
+                    onClick={() => void toggle(game.id)}
                   >
                     Убрать
                   </button>
@@ -80,10 +90,10 @@ export default function CabinetPage() {
 
       <section className="section">
         <h2>Купленные игры</h2>
-        <p>Здесь появятся купленные игры после подключения базы данных.</p>
+        <p>Здесь появятся купленные игры после подключения оплаты.</p>
       </section>
 
-      <button type="button" onClick={logout}>
+      <button type="button" onClick={() => void logout()}>
         Выйти
       </button>
     </main>

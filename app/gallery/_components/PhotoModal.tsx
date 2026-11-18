@@ -11,7 +11,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { createPortal } from "react-dom";
-import { useDemoAuth } from "../../providers/DemoAuthProvider";
+import { useAuth } from "../../providers/AuthProvider";
 import { useWishlist } from "../../providers/WishlistProvider";
 import type { Game } from "../../data/games";
 import styles from "./PhotoModal.module.css";
@@ -39,7 +39,7 @@ export default function PhotoModal({
   onClose,
   returnFocusTo,
 }: PhotoModalProps) {
-  const { user } = useDemoAuth();
+  const { user } = useAuth();
   const { has, toggle } = useWishlist();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -156,7 +156,7 @@ export default function PhotoModal({
               }
               type="button"
               aria-pressed={has(game.id)}
-              onClick={() => toggle(game.id)}
+              onClick={() => void toggle(game.id)}
             >
               {has(game.id)
                 ? "Удалить из избранного"
@@ -171,7 +171,7 @@ export default function PhotoModal({
 
         {user ? (
           <p className={styles.note}>
-            Избранное хранится только до обновления страницы.
+            Избранное сохраняется в базе данных и доступно после перезагрузки.
           </p>
         ) : null}
       </div>

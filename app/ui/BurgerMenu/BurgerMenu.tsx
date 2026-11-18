@@ -10,7 +10,7 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
-import { useDemoAuth } from "../../providers/DemoAuthProvider";
+import { useAuth } from "../../providers/AuthProvider";
 import styles from "./styles.module.css";
 
 // Описываем пункты меню единым массивом.
@@ -36,7 +36,7 @@ function isActive(pathname: string, href: string): boolean {
 // Объявляем основной компонент этого файла.
 export default function BurgerMenu() {
   const pathname = usePathname();
-  const { user, logout } = useDemoAuth();
+  const { user, logout } = useAuth();
   // Создаём локальное состояние компонента.
   const [open, setOpen] = useState(false);
   const openButtonRef = useRef<HTMLButtonElement>(null);
@@ -165,8 +165,7 @@ export default function BurgerMenu() {
                   <button
                     type="button"
                     onClick={() => {
-                      logout();
-                      closeMenu();
+                      void logout().then(closeMenu);
                     }}
                   >
                     Выйти

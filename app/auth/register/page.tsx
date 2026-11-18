@@ -1,26 +1,27 @@
-// Создаёт учебного пользователя после отправки формы
-// регистрации.
+// Регистрирует пользователя через серверный маршрут
+// и переводит его в личный кабинет.
 
 "use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { useDemoAuth } from "../../providers/DemoAuthProvider";
+import { useAuth } from "../../providers/AuthProvider";
 
 // Объявляем основной компонент этого файла.
 export default function RegisterPage() {
   const router = useRouter();
-  const { register } = useDemoAuth();
+  const { register } = useAuth();
   // Создаём локальное состояние компонента.
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
 
   // Обрабатываем отправку формы без перезагрузки страницы.
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     // Отменяем стандартное действие события и выполняем
     // собственную логику.
     event.preventDefault();
@@ -36,9 +37,24 @@ export default function RegisterPage() {
       return;
     }
 
-    register(name, email.trim());
-    // После успешного действия переходим на следующий маршрут.
-    router.push("/cabinet");
+    setPending(true);
+    try {
+      // Сервер повторно валидирует поля и хеширует пароль.
+      const result = await register({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        confirmPassword: confirmation,
+      });
+      if (!result.ok) {
+        setError(result.errors.join(" "));
+        return;
+      }
+      // После успешного действия переходим на следующий маршрут.
+      router.push("/cabinet");
+    } finally {
+      setPending(false);
+    }
   }
 
   // Возвращаем JSX-разметку, которую React выведет на странице.
@@ -46,8 +62,8 @@ export default function RegisterPage() {
     <main className="container form-page">
       <h1 className="title">Регистрация</h1>
       <p className="demo-warning">
-        Данные существуют только в состоянии текущей вкладки и не записываются
-        в БД.
+        Аккаунт создаётся в базе данных: пароль хранится только в виде
+        bcrypt-хеша.
       </p>
       <form className="auth-form" onSubmit={handleSubmit}>
         <label htmlFor="email">Email</label>
@@ -88,7 +104,9 @@ export default function RegisterPage() {
           required
         />
         {error ? <p className="form-error">{error}</p> : null}
-        <button type="submit">Создать аккаунт</button>
+        <button type="submit" disabled={pending}>
+          {pending ? "Создание аккаунта…" : "Создать аккаунт"}
+        </button>
       </form>
       <p>
         Есть аккаунт? <Link href="/auth/login">Войти</Link>

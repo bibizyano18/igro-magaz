@@ -3,7 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { useDemoAuth } from "../providers/DemoAuthProvider";
+import { useAuth } from "../providers/AuthProvider";
 import { useWishlist } from "../providers/WishlistProvider";
 
 // Типизируем входные свойства компонента.
@@ -13,8 +13,13 @@ type WishlistButtonProps = {
 
 // Объявляем основной компонент этого файла.
 export default function WishlistButton({ gameId }: WishlistButtonProps) {
-  const { user } = useDemoAuth();
+  const { user, loading } = useAuth();
   const { has, toggle } = useWishlist();
+
+  // Пока неизвестна сессия, не мигаем ссылкой для гостя.
+  if (loading) {
+    return <span className="wishlist-login">…</span>;
+  }
 
   // Гость не управляет вишлистом: предлагаем войти.
   if (!user) {
@@ -33,7 +38,7 @@ export default function WishlistButton({ gameId }: WishlistButtonProps) {
       className={inWishlist ? "wishlist-btn wishlist-btn_active" : "wishlist-btn"}
       type="button"
       aria-pressed={inWishlist}
-      onClick={() => toggle(gameId)}
+      onClick={() => void toggle(gameId)}
     >
       {inWishlist ? "В вишлисте ✓" : "Добавить в вишлист"}
     </button>

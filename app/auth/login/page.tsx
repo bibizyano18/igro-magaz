@@ -1,24 +1,25 @@
-// Обрабатывает учебный вход и переводит пользователя
-// в личный кабинет.
+// Обрабатывает вход через серверный маршрут и переводит
+// пользователя в личный кабинет.
 
 "use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { useDemoAuth } from "../../providers/DemoAuthProvider";
+import { useAuth } from "../../providers/AuthProvider";
 
 // Объявляем основной компонент этого файла.
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useDemoAuth();
+  const { login } = useAuth();
   // Создаём локальное состояние компонента.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
 
   // Обрабатываем отправку формы без перезагрузки страницы.
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     // Отменяем стандартное действие события и выполняем
     // собственную логику.
     event.preventDefault();
@@ -29,9 +30,19 @@ export default function LoginPage() {
       return;
     }
 
-    login(email.trim());
-    // После успешного действия переходим на следующий маршрут.
-    router.push("/cabinet");
+    setPending(true);
+    try {
+      // Отправляем данные на сервер: пароль проверяется против bcrypt-хеша.
+      const result = await login(email.trim(), password);
+      if (!result.ok) {
+        setError(result.errors.join(" "));
+        return;
+      }
+      // После успешного действия переходим на следующий маршрут.
+      router.push("/cabinet");
+    } finally {
+      setPending(false);
+    }
   }
 
   // Возвращаем JSX-разметку, которую React выведет на странице.
@@ -39,7 +50,7 @@ export default function LoginPage() {
     <main className="container form-page">
       <h1 className="title">Вход в личный кабинет</h1>
       <p className="demo-warning">
-        Учебный прототип: пароль не проверяется сервером и не сохраняется.
+        Данные отправляются на сервер: пароль сверяется с bcrypt-хешем в базе.
       </p>
       <form className="auth-form" onSubmit={handleSubmit}>
         <label htmlFor="email">Email / логин</label>
@@ -62,7 +73,9 @@ export default function LoginPage() {
           required
         />
         {error ? <p className="form-error">{error}</p> : null}
-        <button type="submit">Войти</button>
+        <button type="submit" disabled={pending}>
+          {pending ? "Выполняется вход…" : "Войти"}
+        </button>
       </form>
       <p>
         Нет аккаунта? <Link href="/auth/register">Зарегистрироваться</Link>
