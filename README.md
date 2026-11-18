@@ -14,6 +14,34 @@ pnpm dev
 bun dev
 ```
 
+```bash
+PRISMA
+# Служба запущена
+brew services list | grep postgres
+
+# psql работает
+psql --version
+
+# Подключение под админом
+psql -h localhost -p 5432 -U postgres -d postgres
+\conninfo
+SELECT version();
+\q
+
+# Подключение под прикладной ролью 
+psql -h localhost -p 5432 -U study_app -d study_space
+SELECT current_database(), current_user, inet_server_port();
+\dt
+\q
+
+# Prisma
+npx prisma --version
+npx prisma validate
+npx prisma generate
+npm run db:check
+
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
